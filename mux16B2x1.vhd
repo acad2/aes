@@ -39,7 +39,8 @@ end mux16B2x1;
 architecture Behavioral of mux16B2x1 is
 
 begin
-	q <= d0 when (sel = X"0") else d1;
+	-- might be nice to add sel = X"b" in order to adjust for hardware delays when switching mux
+	q <= d0 when (sel = X"0" or sel = X"b") else d1;
 
 end Behavioral;
 
