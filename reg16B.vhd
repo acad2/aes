@@ -41,7 +41,7 @@ architecture Behavioral of reg16B is
 begin
 	process(clk, clr)
 	begin
-		if rising_edge(clk) then
+		if clr = '0' and rising_edge(clk) then
 			q <= d;
 		end if;
 	end process;
