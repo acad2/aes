@@ -40,6 +40,12 @@ end toplevel;
 
 architecture Behavioral of toplevel is
 
+	COMPONENT roundCount PORT ( 
+		clk : in  STD_LOGIC;
+		clr : in  STD_LOGIC;
+		q : out  STD_LOGIC_VECTOR (3 downto 0));
+	END COMPONENT roundCount;
+
 	COMPONENT keySchedule PORT ( 
 			clk : in  STD_LOGIC;
 			clr : in  STD_LOGIC;
@@ -48,17 +54,22 @@ architecture Behavioral of toplevel is
 			roundKey : out  STD_LOGIC_VECTOR (127 downto 0));
 	END COMPONENT keySchedule;
 
-	COMPONENT roundCount PORT ( 
+	COMPONENT encrypt PORT ( 
 		clk : in  STD_LOGIC;
 		clr : in  STD_LOGIC;
-		q : out  STD_LOGIC_VECTOR (3 downto 0));
-	END COMPONENT roundCount;
-
+		roundNumber : in  STD_LOGIC_VECTOR (3 downto 0);
+		roundKey : in  STD_LOGIC_VECTOR (127 downto 0);
+		plaintext : in  STD_LOGIC_VECTOR (127 downto 0);
+		ciphertext : out  STD_LOGIC_VECTOR (127 downto 0));
+	END COMPONENT encrypt;
+	
 	signal roundNumber : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+	signal roundKey    : STD_LOGIC_VECTOR(127 downto 0) := (others => '0');
 begin
 
 roundCounter: roundCount  port map(clk, clr, roundNumber);
-keyScheduler: keySchedule port map(clk, clr, roundNumber, originalKey, ciphertext);
+keyScheduler: keySchedule port map(clk, clr, roundNumber, originalKey, roundKey);
+encrypter:	  encrypt     port map(clk, clr, roundNumber, roundKey, plaintext, ciphertext);
 r <= roundNumber;
 
 end Behavioral;
