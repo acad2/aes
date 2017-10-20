@@ -39,20 +39,23 @@ end roundCount;
 
 architecture Behavioral of roundCount is
 	signal temp : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+	signal en	: STD_LOGIC := '0';
 begin
 
 	process(clk, clr)
 	begin
+		
 		if clr = '1' then
-			temp <= "0000";
-		elsif(rising_edge(clk)) then
-			if temp = "1010" then
-				temp <= "0000";
-			else 
+			temp <= X"B";
+		elsif rising_edge(clk) then
+			if temp = X"B" then
+				temp <= X"0";
+			else
 				temp <= temp + 1;
 			end if;
 		end if;
 	end process;
+	
 	q <= temp;
 
 end Behavioral;
