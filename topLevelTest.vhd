@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer:
 --
--- Create Date:   19:44:36 10/20/2017
+-- Create Date:   07:49:48 12/10/2017
 -- Design Name:   
--- Module Name:   E:/aes/toplevelTest.vhd
+-- Module Name:   E:/aes/topLevelTest.vhd
 -- Project Name:  aes
 -- Target Device:  
 -- Tool versions:  
@@ -32,10 +32,10 @@ USE ieee.std_logic_1164.ALL;
 -- arithmetic functions with Signed or Unsigned values
 --USE ieee.numeric_std.ALL;
  
-ENTITY toplevelTest IS
-END toplevelTest;
+ENTITY topLevelTest IS
+END topLevelTest;
  
-ARCHITECTURE behavior OF toplevelTest IS 
+ARCHITECTURE behavior OF topLevelTest IS 
  
     -- Component Declaration for the Unit Under Test (UUT)
  
@@ -43,26 +43,30 @@ ARCHITECTURE behavior OF toplevelTest IS
     PORT(
          clk : IN  std_logic;
          clr : IN  std_logic;
+         enc : IN  std_logic;
+         done : OUT  std_logic;
          r : OUT  std_logic_vector(3 downto 0);
          originalKey : IN  std_logic_vector(127 downto 0);
-         plaintext : IN  std_logic_vector(127 downto 0);
-         ciphertext : OUT  std_logic_vector(127 downto 0)
+         intext : IN  std_logic_vector(127 downto 0);
+         outtext : OUT  std_logic_vector(127 downto 0)
         );
     END COMPONENT;
     
 
    --Inputs
    signal clk : std_logic := '0';
-   signal clr : std_logic := '0';
+   signal clr : std_logic := '1';
+   signal enc : std_logic := '0';
    signal originalKey : std_logic_vector(127 downto 0) := (others => '0');
-   signal plaintext : std_logic_vector(127 downto 0) := (others => '0');
+   signal intext : std_logic_vector(127 downto 0) := (others => '0');
 
  	--Outputs
+   signal done : std_logic;
    signal r : std_logic_vector(3 downto 0);
-   signal ciphertext : std_logic_vector(127 downto 0);
+   signal outtext : std_logic_vector(127 downto 0);
 
    -- Clock period definitions
-   constant clk_period : time := 30 ns;
+   constant clk_period : time := 10 ns;
  
 BEGIN
  
@@ -70,10 +74,12 @@ BEGIN
    uut: toplevel PORT MAP (
           clk => clk,
           clr => clr,
+          enc => enc,
+          done => done,
           r => r,
           originalKey => originalKey,
-          plaintext => plaintext,
-          ciphertext => ciphertext
+          intext => intext,
+          outtext => outtext
         );
 
    -- Clock process definitions
@@ -90,18 +96,22 @@ BEGIN
    stim_proc: process
    begin		
       -- hold reset state for 100 ns.
-      wait for 100 ns;	
-		clr <= '1';
-		originalKey <= X"5468617473206D79204B756E67204675";
-		plaintext	<= X"54776F204F6E65204E696E652054776F";
+      wait for 100 ns;
+		originalKey <= x"5468617473206D79204B756E67204675";
+		intext      <= x"54776F204F6E65204E696E652054776F";
+		enc <= '1';
 		
-		wait for 1 ns;
-		clr <= '0';
-		wait for 9 ns;
 
-		wait for clk_period;
+      wait for clk_period*3;
 		clr <= '0';
-
+		
+		wait for clk_period*30;
+		intext <= x"29C3505F571420F6402299B31A02D73A";
+		enc <= '0';
+		clr <= '1';
+		
+		wait for clk_period*3;
+		clr<= '0';
       -- insert stimulus here 
 
       wait;

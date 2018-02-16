@@ -22,7 +22,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
---use IEEE.NUMERIC_STD.ALL;
+use IEEE.NUMERIC_STD.ALL;
 
 -- Uncomment the following library declaration if instantiating
 -- any Xilinx primitives in this code.
@@ -73,6 +73,12 @@ architecture Behavioral of keySchedule is
 	signal q 			: STD_LOGIC_VECTOR(127 downto 0) := (others => '0');
 	signal from_mux   : STD_LOGIC_VECTOR(127 downto 0) := (others => '0');
 	signal from_register: STD_LOGIC_VECTOR(127 downto 0) := (others => '0');
+	
+	--signals to store the key and provide accordingly
+	type ram_type is array (0 to (2**roundNumber'length)-1) of std_logic_vector(127 downto 0);
+	signal ram : ram_type;
+	signal read_address : std_logic_vector(roundNumber'range);
+	signal en : STD_LOGIC := '1';
 begin
 
 initMux : mux16B2x1 port map(roundNumber, originalKey, q, from_mux);
@@ -88,5 +94,21 @@ q( 63 downto 32) <= q( 95 downto 64) xor from_register( 63 downto 32);
 q( 31 downto  0) <= q( 63 downto 32) xor from_register( 31 downto  0);
 
 keyRegister : reg16B port map(clk, clr, from_mux, from_register);
-roundKey <= from_mux;
+
+PROCESS(clr, clk, roundNumber)
+BEGIN
+	if clr = '1' then
+		en <= '1';
+	elsif rising_edge(clk) then
+		if en = '1' then 
+			if roundNumber = x"B" then
+				en <= '0';
+			end if;
+		else
+			ram(to_integer(unsigned(roundNumber))) <= from_mux;
+		end if;
+	end if;
+	roundKey <= ram(to_integer(unsigned(roundNumber)));
+END PROCESS;
+
 end Behavioral;

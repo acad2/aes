@@ -34,29 +34,43 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 entity roundCount is
     Port ( clk : in  STD_LOGIC;
            clr : in  STD_LOGIC;
+			  enc  : in  STD_LOGIC;
            q : out  STD_LOGIC_VECTOR (3 downto 0));
 end roundCount;
 
 architecture Behavioral of roundCount is
 	signal temp : STD_LOGIC_VECTOR(3 downto 0) := (others => '0');
+	signal up	: STD_LOGIC := '1';
 	signal en	: STD_LOGIC := '0';
 begin
 
-	process(clk, clr)
-	begin
-		
-		if clr = '1' then
-			temp <= X"B";
-		elsif rising_edge(clk) then
-			if temp = X"B" then
-				temp <= X"0";
+
+PROCESS(clk, clr, enc, up)
+BEGIN
+	if clr='1' then
+		temp <= x"B";
+		up <= '1';
+	elsif rising_edge(clk) then
+		if up = '1' then
+			if temp = x"B" then
+				temp <= x"0";
 			else
 				temp <= temp + 1;
 			end if;
+		else
+			if temp = x"0" then
+				temp <= x"B";
+			else
+				temp <= temp - 1;
+			end if;
 		end if;
-	end process;
+		if temp = x"B" and enc='0' and up='1' then
+			up <= '0';
+			temp <= x"B";
+		end if;
+	end if;
+END PROCESS;
 	
 	q <= temp;
 
 end Behavioral;
-

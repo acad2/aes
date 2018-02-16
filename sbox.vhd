@@ -63,4 +63,3 @@ begin
 
 	q <= sboxValues(to_integer(unsigned(d)));
 end Behavioral;
-

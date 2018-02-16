@@ -86,6 +86,7 @@ storedState : reg16B port map(clk, clr, from_addRoundKey, from_register);
 subBytesLayer : sbox16B port map(clk, from_register, from_subBytes);
 shiftRowsLayer : shiftRows port map(from_subBytes, from_shiftRows);
 mixColumnsLayer: mixColumns port map(clk, from_shiftRows, from_mixColumns);
-ciphertext <= from_addRoundKey;
+-- ciphertext <= from_addRoundKey;
+ciphertext <= from_register;
 end Behavioral;
 
